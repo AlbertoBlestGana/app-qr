@@ -34,10 +34,20 @@ iniciarApp()
 
 }
 
-function cambiarUsuario(){
+async function cambiarUsuario(){
+
+if(qr && scanning){
+await qr.stop()
+scanning=false
+}
 
 localStorage.removeItem("usuario")
-location.reload()
+
+document.getElementById("app").style.display="none"
+document.getElementById("login").style.display="block"
+
+document.getElementById("nombre").value=""
+document.getElementById("apellido").value=""
 
 }
 
@@ -149,7 +159,7 @@ curso=""
 
 }
 
-setTimeout(()=>cooldown=false,800)
+setTimeout(()=>cooldown=false,600)
 
 }
 
@@ -163,7 +173,7 @@ document.getElementById("resultado").innerText="Escanea el curso"
 
 document.getElementById("btnSiguiente").style.display="none"
 
-iniciarEscaneo()
+setTimeout(()=>iniciarEscaneo(),10)
 
 }
 
