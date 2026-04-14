@@ -10,8 +10,24 @@ let cooldown=false
 
 const beep=new Audio("https://www.soundjay.com/buttons/beep-07.wav")
 
+/* SERVICE WORKER */
+
 if("serviceWorker" in navigator){
 navigator.serviceWorker.register("service-worker.js")
+}
+
+/* PEDIR PERMISO DE CAMARA SOLO UNA VEZ */
+
+async function prepararCamara(){
+
+try{
+
+const stream=await navigator.mediaDevices.getUserMedia({video:true})
+
+stream.getTracks().forEach(track=>track.stop())
+
+}catch(e){}
+
 }
 
 /* LOGIN */
@@ -46,7 +62,6 @@ document.getElementById("app").style.display="none"
 document.getElementById("login").style.display="block"
 
 document.getElementById("nombreCompleto").value=""
-
 document.getElementById("resultado").innerText=""
 
 paso="equipo"
@@ -293,7 +308,11 @@ cargarHistorial()
 
 }
 
+/* AUTO LOGIN */
+
 window.onload=()=>{
+
+prepararCamara()
 
 if(localStorage.getItem("usuario")){
 iniciarApp()
