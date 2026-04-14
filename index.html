@@ -4,7 +4,8 @@
 
 <meta charset="UTF-8">
 <title>Registro QR</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <link rel="manifest" href="manifest.json">
 
@@ -23,12 +24,17 @@ width:80%;
 }
 
 button{
-margin:8px;
 padding:10px 15px;
+margin:8px;
 }
 
 #app{
 display:none;
+}
+
+#reader{
+width:300px;
+margin:auto;
 }
 
 #historial{
@@ -77,9 +83,9 @@ color:white;
 
 <button onclick="deshacer()">↩ Deshacer último</button>
 
-<button onclick="finalizarRegistro()">📊 Finalizar y exportar Excel</button>
+<button onclick="finalizarRegistro()">📊 Exportar Excel</button>
 
-<h2>📦 Escaneo</h2>
+<h2>Escaneo</h2>
 
 <div id="reader"></div>
 
@@ -87,7 +93,7 @@ color:white;
 
 <button id="btnSiguiente" onclick="siguientePaso()">➡ Escanear curso</button>
 
-<h2>📋 Historial</h2>
+<h2>Historial</h2>
 
 <div id="historial"></div>
 
@@ -95,6 +101,7 @@ color:white;
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 <script src="app.js"></script>
 
 </body>
