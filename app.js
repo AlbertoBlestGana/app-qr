@@ -126,8 +126,6 @@ document.getElementById("resultado").innerText="Equipo: "+equipo;
 
 document.getElementById("btnSiguiente").style.display="inline-block";
 
-/* PAUSAR CAMARA */
-
 await qr.pause(true);
 
 }
@@ -230,24 +228,70 @@ cargarHistorial();
 
 }
 
-/* EXPORTAR EXCEL */
+/* EXPORTAR EXCEL MEJOR FORMATEADO */
 
 function exportarExcel(){
 
-let registros=JSON.parse(localStorage.getItem("registros"))||[];
+let registros = JSON.parse(localStorage.getItem("registros")) || [];
 
 if(registros.length===0){
 alert("No hay registros");
 return;
 }
 
-let ws=XLSX.utils.json_to_sheet(registros);
+/* FORMATEAR DATOS */
 
-let wb=XLSX.utils.book_new();
+let datos = registros.map(r => ({
+Nombre: r.nombre,
+Apellido: r.apellido,
+Equipo: r.equipo,
+Curso: r.curso,
+Fecha: r.fecha
+}));
 
-XLSX.utils.book_append_sheet(wb,ws,"Registro");
+let ws = XLSX.utils.json_to_sheet(datos);
 
-let fecha=new Date().toISOString().replace(/[:.]/g,"-");
+/* ANCHO COLUMNAS */
+
+ws["!cols"] = [
+{ wch:18 },
+{ wch:18 },
+{ wch:15 },
+{ wch:20 },
+{ wch:22 }
+];
+
+/* WRAP TEXT */
+
+Object.keys(ws).forEach(cell => {
+
+if(cell[0] === "!") return;
+
+if(!ws[cell].s) ws[cell].s = {};
+
+ws[cell].s = {
+alignment:{
+wrapText:true,
+vertical:"center",
+horizontal:"center"
+}
+};
+
+});
+
+/* LIBRO */
+
+let wb = XLSX.utils.book_new();
+
+XLSX.utils.book_append_sheet(wb, ws, "Registro");
+
+/* NOMBRE ARCHIVO */
+
+let fecha = new Date()
+.toISOString()
+.replace(/[:.]/g,"-");
+
+/* EXPORTAR */
 
 XLSX.writeFile(wb,"registro-"+fecha+".xlsx");
 
