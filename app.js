@@ -1,45 +1,43 @@
-let nombre="";
-let apellido="";
+let nombre=""
+let apellido=""
 
-let equipo="";
-let curso="";
+let equipo=""
+let curso=""
 
-let paso="equipo";
+let paso="equipo"
 
-let escaneando=false;
+let qr=null
+let scanning=false
+let cooldown=false
 
-let qr;
-
-const beep = new Audio("https://www.soundjay.com/buttons/beep-07.wav");
-
-/* SERVICE WORKER */
+const beep=new Audio("https://www.soundjay.com/buttons/beep-07.wav")
 
 if("serviceWorker" in navigator){
-navigator.serviceWorker.register("service-worker.js");
+navigator.serviceWorker.register("service-worker.js")
 }
 
 /* LOGIN */
 
 function guardarUsuario(){
 
-nombre=document.getElementById("nombre").value.trim();
-apellido=document.getElementById("apellido").value.trim();
+nombre=document.getElementById("nombre").value.trim()
+apellido=document.getElementById("apellido").value.trim()
 
-if(!nombre || !apellido){
-alert("Completa datos");
-return;
+if(!nombre||!apellido){
+alert("Completa datos")
+return
 }
 
-localStorage.setItem("usuario",JSON.stringify({nombre,apellido}));
+localStorage.setItem("usuario",JSON.stringify({nombre,apellido}))
 
-iniciarApp();
+iniciarApp()
 
 }
 
 function cambiarUsuario(){
 
-localStorage.removeItem("usuario");
-location.reload();
+localStorage.removeItem("usuario")
+location.reload()
 
 }
 
@@ -47,125 +45,125 @@ location.reload();
 
 function iniciarApp(){
 
-const user=JSON.parse(localStorage.getItem("usuario"));
+const user=JSON.parse(localStorage.getItem("usuario"))
 
-if(!user) return;
+if(!user)return
 
-nombre=user.nombre;
-apellido=user.apellido;
+nombre=user.nombre
+apellido=user.apellido
 
-document.getElementById("login").style.display="none";
-document.getElementById("app").style.display="block";
+document.getElementById("login").style.display="none"
+document.getElementById("app").style.display="block"
 
-document.getElementById("usuario").innerText=`👤 ${nombre} ${apellido}`;
+document.getElementById("usuario").innerText=`👤 ${nombre} ${apellido}`
 
-cargarHistorial();
+cargarHistorial()
 
-iniciarEscaneo();
+iniciarEscaneo()
 
 }
 
-/* INICIAR ESCANEO */
+/* ESCANEO */
 
 async function iniciarEscaneo(){
 
-qr = new Html5Qrcode("reader");
+if(scanning)return
+
+qr=new Html5Qrcode("reader")
 
 try{
 
 await qr.start(
-{ facingMode:"environment" },
-{ fps:10, qrbox:{width:250,height:250} },
-(text)=>procesarQR(text)
-);
+{facingMode:"environment"},
+{fps:12,qrbox:{width:250,height:250}},
+onScan
+)
 
 }catch{
 
-const devices = await Html5Qrcode.getCameras();
+const devices=await Html5Qrcode.getCameras()
 
-let cameraId=devices[0].id;
+let cam=devices[0].id
 
 for(let d of devices){
 
-let label=d.label.toLowerCase();
+let label=d.label.toLowerCase()
 
 if(label.includes("back")||label.includes("rear")||label.includes("environment")){
-cameraId=d.id;
-break;
+cam=d.id
+break
 }
 
 }
 
-await qr.start(
-cameraId,
-{ fps:10, qrbox:{width:250,height:250} },
-(text)=>procesarQR(text)
-);
+await qr.start(cam,{fps:12,qrbox:{width:250,height:250}},onScan)
 
 }
 
+scanning=true
+
 }
 
-/* PROCESAR QR */
+async function detenerEscaneo(){
 
-async function procesarQR(text){
+if(!scanning)return
 
-if(escaneando) return;
+await qr.stop()
 
-escaneando=true;
+scanning=false
 
-beep.play();
+}
 
-/* ESCANEA EQUIPO */
+/* SCAN */
+
+async function onScan(text){
+
+if(cooldown)return
+
+cooldown=true
+
+beep.play()
+
+await detenerEscaneo()
 
 if(paso==="equipo"){
 
-equipo=text;
+equipo=text
 
-document.getElementById("resultado").innerText="Equipo: "+equipo;
+document.getElementById("resultado").innerText="Equipo: "+equipo
 
-document.getElementById("btnSiguiente").style.display="inline-block";
+document.getElementById("btnSiguiente").style.display="inline-block"
 
-await qr.pause(true);
+}else{
 
-}
+curso=text
 
-/* ESCANEA CURSO */
+document.getElementById("resultado").innerText=`Equipo: ${equipo} | Curso: ${curso}`
 
-else{
+guardarRegistro()
 
-curso=text;
+paso="equipo"
 
-document.getElementById("resultado").innerText=`Equipo: ${equipo} | Curso: ${curso}`;
-
-guardarRegistro();
-
-paso="equipo";
-
-equipo="";
-curso="";
-
-document.getElementById("btnSiguiente").style.display="none";
-
-await qr.pause(true);
+equipo=""
+curso=""
 
 }
 
-setTimeout(()=>escaneando=false,500);
+setTimeout(()=>cooldown=false,800)
 
 }
 
-/* BOTON SIGUIENTE */
+/* SIGUIENTE */
 
-async function siguientePaso(){
+function siguientePaso(){
 
-paso="curso";
+paso="curso"
 
-document.getElementById("resultado").innerText="Escanea el curso";
+document.getElementById("resultado").innerText="Escanea el curso"
 
-document.getElementById("btnSiguiente").style.display="none";
+document.getElementById("btnSiguiente").style.display="none"
 
-await qr.resume();
+iniciarEscaneo()
 
 }
 
@@ -173,7 +171,7 @@ await qr.resume();
 
 function guardarRegistro(){
 
-let registros=JSON.parse(localStorage.getItem("registros"))||[];
+let registros=JSON.parse(localStorage.getItem("registros"))||[]
 
 registros.push({
 nombre,
@@ -181,11 +179,11 @@ apellido,
 equipo,
 curso,
 fecha:new Date().toLocaleString()
-});
+})
 
-localStorage.setItem("registros",JSON.stringify(registros));
+localStorage.setItem("registros",JSON.stringify(registros))
 
-cargarHistorial();
+cargarHistorial()
 
 }
 
@@ -193,19 +191,19 @@ cargarHistorial();
 
 function cargarHistorial(){
 
-let registros=JSON.parse(localStorage.getItem("registros"))||[];
+let registros=JSON.parse(localStorage.getItem("registros"))||[]
 
-let html="";
+let ultimos=registros.slice(-10).reverse()
 
-registros.slice(-10).reverse().forEach(r=>{
+let html=""
 
-html+=`<div>${r.nombre} ${r.apellido} | 📦 ${r.equipo} | 🎓 ${r.curso}</div>`;
+ultimos.forEach(r=>{
+html+=`<div>${r.nombre} ${r.apellido} | 📦 ${r.equipo} | 🎓 ${r.curso}</div>`
+})
 
-});
+document.getElementById("historial").innerHTML=html
 
-document.getElementById("historial").innerHTML=html;
-
-document.getElementById("contador").innerText="Escaneados: "+registros.length;
+document.getElementById("contador").innerText="Escaneados: "+registros.length
 
 }
 
@@ -213,87 +211,57 @@ document.getElementById("contador").innerText="Escaneados: "+registros.length;
 
 function deshacer(){
 
-let registros=JSON.parse(localStorage.getItem("registros"))||[];
+let registros=JSON.parse(localStorage.getItem("registros"))||[]
 
-if(registros.length===0){
-alert("Nada que deshacer");
-return;
+if(!registros.length){
+alert("Nada que deshacer")
+return
 }
 
-registros.pop();
+registros.pop()
 
-localStorage.setItem("registros",JSON.stringify(registros));
+localStorage.setItem("registros",JSON.stringify(registros))
 
-cargarHistorial();
+cargarHistorial()
 
 }
 
-/* EXPORTAR EXCEL MEJOR FORMATEADO */
+/* EXCEL */
 
 function exportarExcel(){
 
-let registros = JSON.parse(localStorage.getItem("registros")) || [];
+let registros=JSON.parse(localStorage.getItem("registros"))||[]
 
-if(registros.length===0){
-alert("No hay registros");
-return;
+if(!registros.length){
+alert("No hay registros")
+return
 }
 
-/* FORMATEAR DATOS */
+let datos=registros.map(r=>({
+Nombre:r.nombre,
+Apellido:r.apellido,
+Equipo:r.equipo,
+Curso:r.curso,
+Fecha:r.fecha
+}))
 
-let datos = registros.map(r => ({
-Nombre: r.nombre,
-Apellido: r.apellido,
-Equipo: r.equipo,
-Curso: r.curso,
-Fecha: r.fecha
-}));
+let ws=XLSX.utils.json_to_sheet(datos)
 
-let ws = XLSX.utils.json_to_sheet(datos);
+ws["!cols"]=[
+{wch:18},
+{wch:18},
+{wch:15},
+{wch:18},
+{wch:22}
+]
 
-/* ANCHO COLUMNAS */
+let wb=XLSX.utils.book_new()
 
-ws["!cols"] = [
-{ wch:18 },
-{ wch:18 },
-{ wch:15 },
-{ wch:20 },
-{ wch:22 }
-];
+XLSX.utils.book_append_sheet(wb,ws,"Registro")
 
-/* WRAP TEXT */
+let fecha=new Date().toISOString().replace(/[:.]/g,"-")
 
-Object.keys(ws).forEach(cell => {
-
-if(cell[0] === "!") return;
-
-if(!ws[cell].s) ws[cell].s = {};
-
-ws[cell].s = {
-alignment:{
-wrapText:true,
-vertical:"center",
-horizontal:"center"
-}
-};
-
-});
-
-/* LIBRO */
-
-let wb = XLSX.utils.book_new();
-
-XLSX.utils.book_append_sheet(wb, ws, "Registro");
-
-/* NOMBRE ARCHIVO */
-
-let fecha = new Date()
-.toISOString()
-.replace(/[:.]/g,"-");
-
-/* EXPORTAR */
-
-XLSX.writeFile(wb,"registro-"+fecha+".xlsx");
+XLSX.writeFile(wb,"registro-"+fecha+".xlsx")
 
 }
 
@@ -301,19 +269,17 @@ XLSX.writeFile(wb,"registro-"+fecha+".xlsx");
 
 function finalizarRegistro(){
 
-if(!confirm("Exportar Excel y comenzar nuevo registro?")) return;
+if(!confirm("Exportar Excel y limpiar registro?"))return
 
-exportarExcel();
+exportarExcel()
 
-localStorage.removeItem("registros");
+localStorage.removeItem("registros")
 
-document.getElementById("resultado").innerText="";
+document.getElementById("resultado").innerText=""
 
-paso="equipo";
+paso="equipo"
 
-cargarHistorial();
-
-alert("Registro exportado y nuevo iniciado");
+cargarHistorial()
 
 }
 
@@ -322,7 +288,7 @@ alert("Registro exportado y nuevo iniciado");
 window.onload=()=>{
 
 if(localStorage.getItem("usuario")){
-iniciarApp();
+iniciarApp()
 }
 
-};
+}
