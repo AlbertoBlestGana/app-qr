@@ -4,6 +4,7 @@
 
 <meta charset="UTF-8">
 <title>Registro QR</title>
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <link rel="manifest" href="manifest.json">
@@ -16,16 +17,28 @@ text-align:center;
 margin:10px;
 }
 
+h1{
+font-size:24px;
+margin-bottom:20px;
+}
+
+h4{
+margin-bottom:5px;
+color:#555;
+}
+
 input{
 padding:10px;
 margin:5px;
 width:80%;
+font-size:16px;
 }
 
 button{
 padding:10px 15px;
 margin:8px;
 font-size:16px;
+cursor:pointer;
 }
 
 #app{
@@ -62,12 +75,13 @@ color:white;
 
 <body>
 
+<h1>REGISTRO DE USO DE EQUIPOS</h1>
+
 <div id="login">
 
-<h2>👤 Estudiante</h2>
+<h4>Estudiante</h4>
 
-<input id="nombre" placeholder="Nombre"><br>
-<input id="apellido" placeholder="Apellido"><br>
+<input id="nombreCompleto" placeholder="Nombre y Apellido"><br>
 
 <button onclick="guardarUsuario()">Continuar</button>
 
@@ -79,10 +93,8 @@ color:white;
 
 <div id="contador">Escaneados: 0</div>
 
-<button onclick="cambiarUsuario()">🔄 Cambiar estudiante</button>
-
+<button onclick="siguienteEstudiante()">➡ Siguiente estudiante</button>
 <button onclick="deshacer()">↩ Deshacer último</button>
-
 <button onclick="finalizarRegistro()">📊 Exportar Excel</button>
 
 <h2>Escaneo</h2>
