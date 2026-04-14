@@ -1,4 +1,4 @@
-const CACHE="qr-app-v1"
+const CACHE="qr-registro-v1"
 
 self.addEventListener("install",e=>{
 self.skipWaiting()
