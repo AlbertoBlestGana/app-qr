@@ -1,22 +1,13 @@
-const CACHE_NAME="qr-app-v5";
+const CACHE="qr-app-v1"
 
 self.addEventListener("install",e=>{
-self.skipWaiting();
-});
-
-self.addEventListener("activate",event=>{
-event.waitUntil(
-caches.keys().then(keys=>{
-return Promise.all(
-keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k))
-);
+self.skipWaiting()
 })
-);
-self.clients.claim();
-});
 
-self.addEventListener("fetch",event=>{
-event.respondWith(
-fetch(event.request).catch(()=>caches.match(event.request))
-);
-});
+self.addEventListener("activate",e=>{
+self.clients.claim()
+})
+
+self.addEventListener("fetch",e=>{
+e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)))
+})
