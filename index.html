@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Registro QR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+margin:10px;
+}
+
+input{
+padding:10px;
+margin:5px;
+width:80%;
+}
+
+button{
+margin:8px;
+padding:10px 15px;
+}
+
+#app{
+display:none;
+}
+
+#historial{
+max-height:200px;
+overflow-y:auto;
+border:1px solid #ccc;
+padding:5px;
+}
+
+#contador{
+font-size:20px;
+font-weight:bold;
+margin:10px;
+}
+
+#btnSiguiente{
+display:none;
+background:#2c7be5;
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="login">
+
+<h2>👤 Estudiante</h2>
+
+<input id="nombre" placeholder="Nombre"><br>
+<input id="apellido" placeholder="Apellido"><br>
+
+<button onclick="guardarUsuario()">Continuar</button>
+
+</div>
+
+<div id="app">
+
+<h3 id="usuario"></h3>
+
+<div id="contador">Escaneados: 0</div>
+
+<button onclick="cambiarUsuario()">🔄 Cambiar estudiante</button>
+
+<button onclick="deshacer()">↩ Deshacer último</button>
+
+<button onclick="finalizarRegistro()">📊 Finalizar y exportar Excel</button>
+
+<h2>📦 Escaneo</h2>
+
+<div id="reader"></div>
+
+<p id="resultado"></p>
+
+<button id="btnSiguiente" onclick="siguientePaso()">➡ Escanear curso</button>
+
+<h2>📋 Historial</h2>
+
+<div id="historial"></div>
+
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
