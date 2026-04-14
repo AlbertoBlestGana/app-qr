@@ -10,8 +10,6 @@ let cooldown=false
 
 const beep=new Audio("https://www.soundjay.com/buttons/beep-07.wav")
 
-/* SERVICE WORKER */
-
 if("serviceWorker" in navigator){
 navigator.serviceWorker.register("service-worker.js")
 }
@@ -71,8 +69,6 @@ document.getElementById("app").style.display="block"
 document.getElementById("usuario").innerText="👤 "+nombre
 
 cargarHistorial()
-
-/* iniciar escaneo después de mostrar la interfaz */
 
 setTimeout(()=>{
 iniciarEscaneo()
@@ -296,8 +292,6 @@ paso="equipo"
 cargarHistorial()
 
 }
-
-/* AUTO LOGIN */
 
 window.onload=()=>{
 
