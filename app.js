@@ -1,6 +1,4 @@
 let nombre=""
-let apellido=""
-
 let equipo=""
 let curso=""
 
@@ -12,6 +10,8 @@ let cooldown=false
 
 const beep=new Audio("https://www.soundjay.com/buttons/beep-07.wav")
 
+/* SERVICE WORKER */
+
 if("serviceWorker" in navigator){
 navigator.serviceWorker.register("service-worker.js")
 }
@@ -20,21 +20,22 @@ navigator.serviceWorker.register("service-worker.js")
 
 function guardarUsuario(){
 
-nombre=document.getElementById("nombre").value.trim()
-apellido=document.getElementById("apellido").value.trim()
+let nombreCompleto=document.getElementById("nombreCompleto").value.trim()
 
-if(!nombre||!apellido){
-alert("Completa datos")
+if(!nombreCompleto){
+alert("Completa el nombre")
 return
 }
 
-localStorage.setItem("usuario",JSON.stringify({nombre,apellido}))
+localStorage.setItem("usuario",JSON.stringify({nombreCompleto}))
 
 iniciarApp()
 
 }
 
-async function cambiarUsuario(){
+/* SIGUIENTE ESTUDIANTE */
+
+async function siguienteEstudiante(){
 
 if(qr && scanning){
 await qr.stop()
@@ -46,8 +47,11 @@ localStorage.removeItem("usuario")
 document.getElementById("app").style.display="none"
 document.getElementById("login").style.display="block"
 
-document.getElementById("nombre").value=""
-document.getElementById("apellido").value=""
+document.getElementById("nombreCompleto").value=""
+
+document.getElementById("resultado").innerText=""
+
+paso="equipo"
 
 }
 
@@ -59,17 +63,20 @@ const user=JSON.parse(localStorage.getItem("usuario"))
 
 if(!user)return
 
-nombre=user.nombre
-apellido=user.apellido
+nombre=user.nombreCompleto
 
 document.getElementById("login").style.display="none"
 document.getElementById("app").style.display="block"
 
-document.getElementById("usuario").innerText=`👤 ${nombre} ${apellido}`
+document.getElementById("usuario").innerText="👤 "+nombre
 
 cargarHistorial()
 
+/* iniciar escaneo después de mostrar la interfaz */
+
+setTimeout(()=>{
 iniciarEscaneo()
+},50)
 
 }
 
@@ -185,7 +192,6 @@ let registros=JSON.parse(localStorage.getItem("registros"))||[]
 
 registros.push({
 nombre,
-apellido,
 equipo,
 curso,
 fecha:new Date().toLocaleString()
@@ -208,7 +214,7 @@ let ultimos=registros.slice(-10).reverse()
 let html=""
 
 ultimos.forEach(r=>{
-html+=`<div>${r.nombre} ${r.apellido} | 📦 ${r.equipo} | 🎓 ${r.curso}</div>`
+html+=`<div>${r.nombre} | 📦 ${r.equipo} | 🎓 ${r.curso}</div>`
 })
 
 document.getElementById("historial").innerHTML=html
@@ -249,7 +255,6 @@ return
 
 let datos=registros.map(r=>({
 Nombre:r.nombre,
-Apellido:r.apellido,
 Equipo:r.equipo,
 Curso:r.curso,
 Fecha:r.fecha
@@ -258,8 +263,7 @@ Fecha:r.fecha
 let ws=XLSX.utils.json_to_sheet(datos)
 
 ws["!cols"]=[
-{wch:18},
-{wch:18},
+{wch:20},
 {wch:15},
 {wch:18},
 {wch:22}
