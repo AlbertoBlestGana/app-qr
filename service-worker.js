@@ -1,10 +1,11 @@
-const CACHE="qr-registro-v3"
+const CACHE="qr-registro-v4"
 
 const ASSETS=[
 "./",
 "./index.html",
 "./app.js",
-"./manifest.json"
+"./manifest.json",
+"./logo.png"
 ]
 
 self.addEventListener("install",e=>{
